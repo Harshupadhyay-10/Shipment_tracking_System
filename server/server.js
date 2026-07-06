@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
 const shipmentRoutes = require("./routes/shipmentRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
@@ -10,7 +11,7 @@ connectDB();
 
 const allowedOrigins = [
   "http://localhost:5173",
-  process.env.CLIENT_URL, // will be your deployed Vercel URL
+  process.env.CLIENT_URL,
 ];
 
 app.use(
@@ -24,6 +25,7 @@ app.get("/", (req, res) => {
   res.send("GoBetween Tracker API is running");
 });
 
+app.use("/api/auth", authRoutes);
 app.use("/api", shipmentRoutes);
 
 const PORT = process.env.PORT || 5001;
