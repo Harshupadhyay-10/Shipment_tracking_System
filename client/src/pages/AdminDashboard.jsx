@@ -1,16 +1,37 @@
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import api from "../api/axios";
+import AddressFields from "../components/AddressFields";
+
+const emptyParty = {
+  name: "",
+  countryCode: "+91",
+  phone: "",
+  address: "",
+  city: "",
+  state: "",
+  pincode: "",
+};
+
+const emptyPackage = {
+  weight: "",
+  weightUnit: "kg",
+  length: "",
+  width: "",
+  height: "",
+  sizeUnit: "cm",
+  description: "",
+};
 
 function AdminDashboard() {
   const [shipments, setShipments] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({
-    senderName: "", senderPhone: "", senderAddress: "", senderCity: "", senderState: "", senderPincode: "",
-    receiverName: "", receiverPhone: "", receiverAddress: "", receiverCity: "", receiverState: "", receiverPincode: "",
-    weight: "", description: "",
-  });
+
+  const [sender, setSender] = useState(emptyParty);
+  const [receiver, setReceiver] = useState(emptyParty);
+  const [packageDetails, setPackageDetails] = useState(emptyPackage);
+
   const [creating, setCreating] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -40,46 +61,29 @@ function AdminDashboard() {
     fetchCustomers();
   }, []);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
   const handleCreate = async (e) => {
     e.preventDefault();
     setCreating(true);
     setMessage("");
 
     const payload = {
-      sender: {
-        name: formData.senderName,
-        phone: formData.senderPhone,
-        address: formData.senderAddress,
-        city: formData.senderCity,
-        state: formData.senderState,
-        pincode: formData.senderPincode,
-      },
-      receiver: {
-        name: formData.receiverName,
-        phone: formData.receiverPhone,
-        address: formData.receiverAddress,
-        city: formData.receiverCity,
-        state: formData.receiverState,
-        pincode: formData.receiverPincode,
-      },
+      sender,
+      receiver,
       packageDetails: {
-        weight: formData.weight ? Number(formData.weight) : undefined,
-        description: formData.description,
+        ...packageDetails,
+        weight: packageDetails.weight ? Number(packageDetails.weight) : undefined,
+        length: packageDetails.length ? Number(packageDetails.length) : undefined,
+        width: packageDetails.width ? Number(packageDetails.width) : undefined,
+        height: packageDetails.height ? Number(packageDetails.height) : undefined,
       },
     };
 
     try {
       const res = await api.post("/shipments", payload);
       setMessage(`Shipment created. Tracking number: ${res.data.trackingNumber}`);
-      setFormData({
-        senderName: "", senderPhone: "", senderAddress: "", senderCity: "", senderState: "", senderPincode: "",
-        receiverName: "", receiverPhone: "", receiverAddress: "", receiverCity: "", receiverState: "", receiverPincode: "",
-        weight: "", description: "",
-      });
+      setSender(emptyParty);
+      setReceiver(emptyParty);
+      setPackageDetails(emptyPackage);
       fetchShipments();
     } catch (err) {
       setMessage("Failed to create shipment. Check all required fields.");
@@ -104,18 +108,25 @@ function AdminDashboard() {
     const rows = shipments.map((s) => ({
       "Tracking Number": s.trackingNumber,
       "Sender Name": s.sender.name,
+      "Sender Country Code": s.sender.countryCode,
       "Sender Phone": s.sender.phone,
       "Sender Address": s.sender.address,
       "Sender City": s.sender.city,
       "Sender State": s.sender.state,
       "Sender Pincode": s.sender.pincode,
       "Receiver Name": s.receiver.name,
+      "Receiver Country Code": s.receiver.countryCode,
       "Receiver Phone": s.receiver.phone,
       "Receiver Address": s.receiver.address,
       "Receiver City": s.receiver.city,
       "Receiver State": s.receiver.state,
       "Receiver Pincode": s.receiver.pincode,
-      "Weight (kg)": s.packageDetails?.weight || "",
+      "Weight": s.packageDetails?.weight || "",
+      "Weight Unit": s.packageDetails?.weightUnit || "",
+      "Length": s.packageDetails?.length || "",
+      "Width": s.packageDetails?.width || "",
+      "Height": s.packageDetails?.height || "",
+      "Size Unit": s.packageDetails?.sizeUnit || "",
       "Description": s.packageDetails?.description || "",
       "Current Status": s.currentStatus,
       "Created At": new Date(s.createdAt).toLocaleString(),
@@ -150,30 +161,59 @@ function AdminDashboard() {
       <section style={styles.section}>
         <h2>Create New Shipment</h2>
         <form onSubmit={handleCreate} style={styles.form}>
-          <fieldset style={styles.fieldset}>
-            <legend>Sender</legend>
-            <input name="senderName" placeholder="Name" value={formData.senderName} onChange={handleChange} required />
-            <input name="senderPhone" placeholder="Phone" value={formData.senderPhone} onChange={handleChange} required />
-            <input name="senderAddress" placeholder="Address" value={formData.senderAddress} onChange={handleChange} required />
-            <input name="senderCity" placeholder="City" value={formData.senderCity} onChange={handleChange} required />
-            <input name="senderState" placeholder="State" value={formData.senderState} onChange={handleChange} required />
-            <input name="senderPincode" placeholder="Pincode" value={formData.senderPincode} onChange={handleChange} required />
-          </fieldset>
-
-          <fieldset style={styles.fieldset}>
-            <legend>Receiver</legend>
-            <input name="receiverName" placeholder="Name" value={formData.receiverName} onChange={handleChange} required />
-            <input name="receiverPhone" placeholder="Phone" value={formData.receiverPhone} onChange={handleChange} required />
-            <input name="receiverAddress" placeholder="Address" value={formData.receiverAddress} onChange={handleChange} required />
-            <input name="receiverCity" placeholder="City" value={formData.receiverCity} onChange={handleChange} required />
-            <input name="receiverState" placeholder="State" value={formData.receiverState} onChange={handleChange} required />
-            <input name="receiverPincode" placeholder="Pincode" value={formData.receiverPincode} onChange={handleChange} required />
-          </fieldset>
+          <AddressFields label="Sender" values={sender} onChange={setSender} />
+          <AddressFields label="Receiver" values={receiver} onChange={setReceiver} />
 
           <fieldset style={styles.fieldset}>
             <legend>Package</legend>
-            <input name="weight" placeholder="Weight (kg)" value={formData.weight} onChange={handleChange} />
-            <input name="description" placeholder="Description" value={formData.description} onChange={handleChange} />
+
+            <div style={styles.row}>
+              <input
+                placeholder="Weight"
+                value={packageDetails.weight}
+                onChange={(e) => setPackageDetails({ ...packageDetails, weight: e.target.value })}
+                style={{ flex: 1 }}
+              />
+              <select
+                value={packageDetails.weightUnit}
+                onChange={(e) => setPackageDetails({ ...packageDetails, weightUnit: e.target.value })}
+              >
+                <option value="kg">kg</option>
+                <option value="g">g</option>
+                <option value="lb">lb</option>
+              </select>
+            </div>
+
+            <div style={styles.row}>
+              <input
+                placeholder="Length"
+                value={packageDetails.length}
+                onChange={(e) => setPackageDetails({ ...packageDetails, length: e.target.value })}
+              />
+              <input
+                placeholder="Width"
+                value={packageDetails.width}
+                onChange={(e) => setPackageDetails({ ...packageDetails, width: e.target.value })}
+              />
+              <input
+                placeholder="Height"
+                value={packageDetails.height}
+                onChange={(e) => setPackageDetails({ ...packageDetails, height: e.target.value })}
+              />
+              <select
+                value={packageDetails.sizeUnit}
+                onChange={(e) => setPackageDetails({ ...packageDetails, sizeUnit: e.target.value })}
+              >
+                <option value="cm">cm</option>
+                <option value="in">in</option>
+              </select>
+            </div>
+
+            <input
+              placeholder="Description"
+              value={packageDetails.description}
+              onChange={(e) => setPackageDetails({ ...packageDetails, description: e.target.value })}
+            />
           </fieldset>
 
           <button type="submit" disabled={creating} style={styles.button}>
@@ -279,7 +319,8 @@ const styles = {
   section: { marginBottom: "40px" },
   sectionHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" },
   form: { display: "flex", flexDirection: "column", gap: "16px" },
-  fieldset: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", padding: "12px" },
+  fieldset: { display: "flex", flexDirection: "column", gap: "8px", padding: "12px" },
+  row: { display: "flex", gap: "8px" },
   button: { padding: "10px 20px", fontSize: "16px", background: "#1a1a1a", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer", width: "200px" },
   exportButton: { padding: "8px 16px", background: "#0a7d2c", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" },
   message: { marginTop: "10px", fontWeight: "bold" },
