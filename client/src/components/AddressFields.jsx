@@ -49,7 +49,7 @@ function AddressFields({ label, values, onChange }) {
   };
 
   return (
-    <fieldset style={styles.fieldset}>
+    <fieldset className="fieldset">
       <legend>{label}</legend>
 
       <input
@@ -59,11 +59,11 @@ function AddressFields({ label, values, onChange }) {
         required
       />
 
-      <div style={styles.phoneRow}>
+      <div className="phone-row">
         <select
           value={values.countryCode}
           onChange={(e) => handleFieldChange("countryCode", e.target.value)}
-          style={styles.countryCodeSelect}
+          className="country-code-select"
         >
           {countryCodes.map((c) => (
             <option key={c.code} value={c.code}>
@@ -76,7 +76,7 @@ function AddressFields({ label, values, onChange }) {
           value={values.phone}
           onChange={(e) => handleFieldChange("phone", e.target.value)}
           required
-          style={{ flex: 1 }}
+          className="phone-input"
         />
       </div>
 
@@ -93,7 +93,7 @@ function AddressFields({ label, values, onChange }) {
         onChange={(e) => handlePincodeChange(e.target.value)}
         required
       />
-      {lookupStatus && <small style={styles.lookupStatus}>{lookupStatus}</small>}
+      {lookupStatus && <small className="text-muted">{lookupStatus}</small>}
 
       <select
         value={values.state}
@@ -124,12 +124,5 @@ function AddressFields({ label, values, onChange }) {
     </fieldset>
   );
 }
-
-const styles = {
-  fieldset: { display: "flex", flexDirection: "column", gap: "8px", padding: "12px" },
-  phoneRow: { display: "flex", gap: "8px" },
-  countryCodeSelect: { width: "160px" },
-  lookupStatus: { color: "#555" },
-};
 
 export default AddressFields;

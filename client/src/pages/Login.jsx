@@ -28,15 +28,15 @@ function Login() {
   };
 
   return (
-    <div style={styles.container}>
+  <div className="page-container-narrow">
+    <div className="card">
       <h1>Login</h1>
-      <form onSubmit={handleSubmit} style={styles.form}>
+      <form onSubmit={handleSubmit} className="form">
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          style={styles.input}
           required
         />
         <input
@@ -44,27 +44,19 @@ function Login() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={styles.input}
           required
         />
-        <button type="submit" disabled={loading} style={styles.button}>
+        <button type="submit" disabled={loading} className="btn btn-primary">
           {loading ? "Logging in..." : "Login"}
         </button>
       </form>
-      {error && <p style={styles.error}>{error}</p>}
-      <p>
+      {error && <p className="text-error">{error}</p>}
+      <p className="text-muted">
         Don't have an account? <Link to="/signup">Sign up</Link>
       </p>
     </div>
-  );
+  </div>
+);
 }
-
-const styles = {
-  container: { maxWidth: "400px", margin: "60px auto", fontFamily: "sans-serif", padding: "0 20px" },
-  form: { display: "flex", flexDirection: "column", gap: "12px" },
-  input: { padding: "10px", fontSize: "16px", border: "1px solid #ccc", borderRadius: "4px" },
-  button: { padding: "10px", fontSize: "16px", background: "#1a1a1a", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" },
-  error: { color: "red" },
-};
 
 export default Login;

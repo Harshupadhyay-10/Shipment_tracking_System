@@ -155,19 +155,19 @@ function AdminDashboard() {
   };
 
   return (
-    <div style={styles.container}>
+    <div className="page-container">
       <h1>Admin Dashboard, Go Between India Logistics</h1>
 
-      <section style={styles.section}>
+      <section className="section">
         <h2>Create New Shipment</h2>
-        <form onSubmit={handleCreate} style={styles.form}>
+        <form onSubmit={handleCreate} className="form">
           <AddressFields label="Sender" values={sender} onChange={setSender} />
           <AddressFields label="Receiver" values={receiver} onChange={setReceiver} />
 
-          <fieldset style={styles.fieldset}>
+          <fieldset className="fieldset">
             <legend>Package</legend>
 
-            <div style={styles.row}>
+            <div className="row">
               <input
                 placeholder="Weight"
                 value={packageDetails.weight}
@@ -184,7 +184,7 @@ function AdminDashboard() {
               </select>
             </div>
 
-            <div style={styles.row}>
+            <div className="row">
               <input
                 placeholder="Length"
                 value={packageDetails.length}
@@ -216,17 +216,17 @@ function AdminDashboard() {
             />
           </fieldset>
 
-          <button type="submit" disabled={creating} style={styles.button}>
+          <button type="submit" disabled={creating} className="btn btn-primary">
             {creating ? "Creating..." : "Create Shipment"}
           </button>
         </form>
-        {message && <p style={styles.message}>{message}</p>}
+        {message && <p><strong>{message}</strong></p>}
       </section>
 
-      <section style={styles.section}>
-        <div style={styles.sectionHeader}>
+      <section className="section">
+        <div className="section-header">
           <h2>All Shipments</h2>
-          <button onClick={exportShipmentsToExcel} style={styles.exportButton}>
+          <button onClick={exportShipmentsToExcel} className="btn btn-success">
             Export to Excel
           </button>
         </div>
@@ -235,7 +235,7 @@ function AdminDashboard() {
         ) : shipments.length === 0 ? (
           <p>No shipments yet.</p>
         ) : (
-          <table style={styles.table}>
+          <table>
             <thead>
               <tr>
                 <th>Tracking #</th>
@@ -251,7 +251,11 @@ function AdminDashboard() {
                   <td>{s.trackingNumber}</td>
                   <td>{s.sender.city}</td>
                   <td>{s.receiver.city}</td>
-                  <td>{s.currentStatus}</td>
+                  <td>
+                    <span className={`status-badge status-${s.currentStatus}`}>
+                      {s.currentStatus}
+                    </span>
+                  </td>
                   <td>
                     <select
                       defaultValue=""
@@ -276,17 +280,17 @@ function AdminDashboard() {
         )}
       </section>
 
-      <section style={styles.section}>
-        <div style={styles.sectionHeader}>
+      <section className="section">
+        <div className="section-header">
           <h2>Registered Customers</h2>
-          <button onClick={exportCustomersToExcel} style={styles.exportButton}>
+          <button onClick={exportCustomersToExcel} className="btn btn-success">
             Export to Excel
           </button>
         </div>
         {customers.length === 0 ? (
           <p>No customers registered yet.</p>
         ) : (
-          <table style={styles.table}>
+          <table>
             <thead>
               <tr>
                 <th>Name</th>
@@ -313,18 +317,5 @@ function AdminDashboard() {
     </div>
   );
 }
-
-const styles = {
-  container: { maxWidth: "900px", margin: "40px auto", padding: "0 20px", fontFamily: "sans-serif" },
-  section: { marginBottom: "40px" },
-  sectionHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" },
-  form: { display: "flex", flexDirection: "column", gap: "16px" },
-  fieldset: { display: "flex", flexDirection: "column", gap: "8px", padding: "12px" },
-  row: { display: "flex", gap: "8px" },
-  button: { padding: "10px 20px", fontSize: "16px", background: "#1a1a1a", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer", width: "200px" },
-  exportButton: { padding: "8px 16px", background: "#0a7d2c", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" },
-  message: { marginTop: "10px", fontWeight: "bold" },
-  table: { width: "100%", borderCollapse: "collapse" },
-};
 
 export default AdminDashboard;

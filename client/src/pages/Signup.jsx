@@ -32,34 +32,28 @@ function Signup() {
     }
   };
 
-  return (
-    <div style={styles.container}>
+return (
+  <div className="page-container-narrow">
+    <div className="card">
       <h1>Create Account</h1>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <input name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} style={styles.input} required />
-        <input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleChange} style={styles.input} required />
-        <input name="password" type="password" placeholder="Password" value={formData.password} onChange={handleChange} style={styles.input} required />
-        <input name="phone" placeholder="Phone Number" value={formData.phone} onChange={handleChange} style={styles.input} required />
-        <input name="address" placeholder="Address" value={formData.address} onChange={handleChange} style={styles.input} required />
-        <input name="companyName" placeholder="Company Name (optional)" value={formData.companyName} onChange={handleChange} style={styles.input} />
-        <button type="submit" disabled={loading} style={styles.button}>
+      <form onSubmit={handleSubmit} className="form">
+        <input name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} required />
+        <input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
+        <input name="password" type="password" placeholder="Password" value={formData.password} onChange={handleChange} required />
+        <input name="phone" placeholder="Phone Number" value={formData.phone} onChange={handleChange} required />
+        <input name="address" placeholder="Address" value={formData.address} onChange={handleChange} required />
+        <input name="companyName" placeholder="Company Name (optional)" value={formData.companyName} onChange={handleChange} />
+        <button type="submit" disabled={loading} className="btn btn-primary">
           {loading ? "Creating account..." : "Sign Up"}
         </button>
       </form>
-      {error && <p style={styles.error}>{error}</p>}
-      <p>
+      {error && <p className="text-error">{error}</p>}
+      <p className="text-muted">
         Already have an account? <Link to="/login">Login</Link>
       </p>
     </div>
-  );
+  </div>
+);
 }
-
-const styles = {
-  container: { maxWidth: "400px", margin: "60px auto", fontFamily: "sans-serif", padding: "0 20px" },
-  form: { display: "flex", flexDirection: "column", gap: "12px" },
-  input: { padding: "10px", fontSize: "16px", border: "1px solid #ccc", borderRadius: "4px" },
-  button: { padding: "10px", fontSize: "16px", background: "#1a1a1a", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" },
-  error: { color: "red" },
-};
 
 export default Signup;

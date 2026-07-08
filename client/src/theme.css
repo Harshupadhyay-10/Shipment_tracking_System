@@ -1,0 +1,233 @@
+:root {
+  --color-primary: #1B4B7A;
+  --color-accent: #4A90D9;
+  --color-white: #FFFFFF;
+  --color-bg: #F4F7FA;
+  --color-border: #D8E1E8;
+  --color-text: #1A1A1A;
+  --color-text-muted: #5A6B7A;
+  --color-danger: #D64545;
+  --color-success: #2E9E5B;
+
+  --radius: 6px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --font: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.page-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.page-container-narrow {
+  max-width: 420px;
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+.card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+h1, h2, h3 {
+  color: var(--color-primary);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-white);
+}
+
+.fieldset legend {
+  color: var(--color-primary);
+  font-weight: 600;
+  padding: 0 6px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+}
+
+input, select {
+  padding: 10px;
+  font-size: 15px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-white);
+  color: var(--color-text);
+  font-family: var(--font);
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.2);
+}
+
+.btn {
+  padding: 10px 20px;
+  font-size: 15px;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.15s ease;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.btn-accent {
+  background: var(--color-accent);
+  color: var(--color-white);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  color: var(--color-white);
+}
+
+.btn-success {
+  background: var(--color-success);
+  color: var(--color-white);
+}
+
+.text-error {
+  color: var(--color-danger);
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-white);
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+th {
+  color: var(--color-primary);
+  font-weight: 600;
+  background: var(--color-bg);
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 24px;
+  background: var(--color-white);
+  border-bottom: 2px solid var(--color-primary);
+}
+
+.navbar .logo {
+  height: 36px;
+}
+
+.navbar a {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.navbar .spacer {
+  margin-left: auto;
+}
+
+.navbar .user-info {
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-Pending { background: #FFF3CD; color: #7A5B00; }
+.status-Picked\ Up { background: #D6E9FA; color: #1B4B7A; }
+.status-In\ Transit { background: #D6E9FA; color: #1B4B7A; }
+.status-Out\ for\ Delivery { background: #E3D6FA; color: #5B1B7A; }
+.status-Delivered { background: #D6F5DE; color: #1E6B3A; }
+.status-Cancelled { background: #FADAD6; color: #A8281E; }
+
+.timeline {
+  list-style: none;
+  padding: 0;
+}
+
+.timeline-item {
+  border-left: 3px solid var(--color-accent);
+  padding-left: 12px;
+  margin-bottom: 16px;
+}

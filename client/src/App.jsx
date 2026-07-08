@@ -16,15 +16,16 @@ function Nav() {
   };
 
   return (
-    <nav style={{ padding: "16px", borderBottom: "1px solid #eee", fontFamily: "sans-serif", display: "flex", gap: "16px", alignItems: "center" }}>
+    <nav className="navbar">
+      <img src="/logo.png" alt="Go Between India Logistics" className="logo" />
       <Link to="/">Track Shipment</Link>
       {user?.role === "admin" && <Link to="/admin">Admin Dashboard</Link>}
       {!user && <Link to="/login">Login</Link>}
       {!user && <Link to="/signup">Sign Up</Link>}
       {user && (
-        <span style={{ marginLeft: "auto" }}>
-          Logged in as {user.name} ({user.role}){" "}
-          <button onClick={handleLogout} style={{ marginLeft: "8px", cursor: "pointer" }}>
+        <span className="user-info spacer">
+          {user.name} ({user.role})
+          <button onClick={handleLogout} className="btn btn-danger">
             Logout
           </button>
         </span>
