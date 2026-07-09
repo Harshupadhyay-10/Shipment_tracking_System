@@ -21,6 +21,8 @@ const emptyPackage = {
   height: "",
   sizeUnit: "cm",
   description: "",
+  buyingRate: "",
+  sellingRate: "",
 };
 
 function AdminDashboard() {
@@ -75,6 +77,8 @@ function AdminDashboard() {
         length: packageDetails.length ? Number(packageDetails.length) : undefined,
         width: packageDetails.width ? Number(packageDetails.width) : undefined,
         height: packageDetails.height ? Number(packageDetails.height) : undefined,
+        buyingRate: packageDetails.buyingRate ? Number(packageDetails.buyingRate) : undefined,
+        sellingRate: packageDetails.sellingRate ? Number(packageDetails.sellingRate) : undefined,
       },
     };
 
@@ -128,6 +132,12 @@ function AdminDashboard() {
       "Height": s.packageDetails?.height || "",
       "Size Unit": s.packageDetails?.sizeUnit || "",
       "Description": s.packageDetails?.description || "",
+      "Buying Rate": s.packageDetails?.buyingRate || "",
+      "Selling Rate": s.packageDetails?.sellingRate || "",
+      "Margin":
+        s.packageDetails?.buyingRate && s.packageDetails?.sellingRate
+          ? s.packageDetails.sellingRate - s.packageDetails.buyingRate
+          : "",
       "Current Status": s.currentStatus,
       "Created At": new Date(s.createdAt).toLocaleString(),
     }));
@@ -209,6 +219,21 @@ function AdminDashboard() {
               </select>
             </div>
 
+            <div className="row">
+              <input
+                placeholder="Buying Rate (₹)"
+                type="number"
+                value={packageDetails.buyingRate}
+                onChange={(e) => setPackageDetails({ ...packageDetails, buyingRate: e.target.value })}
+              />
+              <input
+                placeholder="Selling Rate (₹)"
+                type="number"
+                value={packageDetails.sellingRate}
+                onChange={(e) => setPackageDetails({ ...packageDetails, sellingRate: e.target.value })}
+              />
+            </div>
+
             <input
               placeholder="Description"
               value={packageDetails.description}
@@ -241,40 +266,61 @@ function AdminDashboard() {
                 <th>Tracking #</th>
                 <th>From</th>
                 <th>To</th>
+                <th>Buying Rate</th>
+                <th>Selling Rate</th>
+                <th>Margin</th>
                 <th>Status</th>
                 <th>Update</th>
               </tr>
             </thead>
             <tbody>
-              {shipments.map((s) => (
-                <tr key={s._id}>
-                  <td>{s.trackingNumber}</td>
-                  <td>{s.sender.city}</td>
-                  <td>{s.receiver.city}</td>
-                  <td>
-                    <span className={`status-badge status-${s.currentStatus}`}>
-                      {s.currentStatus}
-                    </span>
-                  </td>
-                  <td>
-                    <select
-                      defaultValue=""
-                      onChange={(e) => {
-                        if (e.target.value) handleStatusUpdate(s.trackingNumber, e.target.value);
-                        e.target.value = "";
-                      }}
-                    >
-                      <option value="" disabled>Change status</option>
-                      <option value="Pending">Pending</option>
-                      <option value="Picked Up">Picked Up</option>
-                      <option value="In Transit">In Transit</option>
-                      <option value="Out for Delivery">Out for Delivery</option>
-                      <option value="Delivered">Delivered</option>
-                      <option value="Cancelled">Cancelled</option>
-                    </select>
-                  </td>
-                </tr>
-              ))}
+              {shipments.map((s) => {
+                const buying = s.packageDetails?.buyingRate;
+                const selling = s.packageDetails?.sellingRate;
+                const hasBothRates = buying !== undefined && buying !== null && selling !== undefined && selling !== null;
+                const margin = hasBothRates ? selling - buying : null;
+
+                return (
+                  <tr key={s._id}>
+                    <td>{s.trackingNumber}</td>
+                    <td>{s.sender.city}</td>
+                    <td>{s.receiver.city}</td>
+                    <td>{buying !== undefined && buying !== null ? `₹${buying}` : "N/A"}</td>
+                    <td>{selling !== undefined && selling !== null ? `₹${selling}` : "N/A"}</td>
+                    <td>
+                      {margin !== null ? (
+                        <span style={{ color: margin >= 0 ? "#2E9E5B" : "#D64545", fontWeight: 600 }}>
+                          ₹{margin}
+                        </span>
+                      ) : (
+                        "N/A"
+                      )}
+                    </td>
+                    <td>
+                      <span className={`status-badge status-${s.currentStatus}`}>
+                        {s.currentStatus}
+                      </span>
+                    </td>
+                    <td>
+                      <select
+                        defaultValue=""
+                        onChange={(e) => {
+                          if (e.target.value) handleStatusUpdate(s.trackingNumber, e.target.value);
+                          e.target.value = "";
+                        }}
+                      >
+                        <option value="" disabled>Change status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Picked Up">Picked Up</option>
+                        <option value="In Transit">In Transit</option>
+                        <option value="Out for Delivery">Out for Delivery</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
