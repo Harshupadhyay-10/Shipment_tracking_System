@@ -16,6 +16,7 @@ const emptyParty = {
 const emptyPackage = {
   weight: "",
   weightUnit: "kg",
+  numberOfPackages: "",
   length: "",
   width: "",
   height: "",
@@ -94,6 +95,7 @@ function AdminDashboard() {
       packageDetails: {
         ...packageDetails,
         weight: packageDetails.weight ? Number(packageDetails.weight) : undefined,
+        numberOfPackages: packageDetails.numberOfPackages ? Number(packageDetails.numberOfPackages) : undefined,
         length: packageDetails.length ? Number(packageDetails.length) : undefined,
         width: packageDetails.width ? Number(packageDetails.width) : undefined,
         height: packageDetails.height ? Number(packageDetails.height) : undefined,
@@ -177,6 +179,7 @@ function AdminDashboard() {
       "Receiver Pincode": s.receiver.pincode,
       "Weight": s.packageDetails?.weight || "",
       "Weight Unit": s.packageDetails?.weightUnit || "",
+      "Number of Packages": s.packageDetails?.numberOfPackages || "",
       "Length": s.packageDetails?.length || "",
       "Width": s.packageDetails?.width || "",
       "Height": s.packageDetails?.height || "",
@@ -267,6 +270,14 @@ function AdminDashboard() {
                 <option value="g">g</option>
                 <option value="lb">lb</option>
               </select>
+
+              <input
+                placeholder="Number of Packages"
+                type="number"
+                value={packageDetails.numberOfPackages}
+                onChange={(e) => setPackageDetails({ ...packageDetails, numberOfPackages: e.target.value })}
+                style={{ flex: 1 }}
+              />
             </div>
 
             <div className="row">

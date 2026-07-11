@@ -5,13 +5,17 @@ import AddressFields from "../components/AddressFields";
 
 const emptyParty = { name: "", countryCode: "+91", phone: "", address: "", city: "", state: "", pincode: "" };
 const emptyPackage = {
-  weight: "", weightUnit: "kg", length: "", width: "", height: "", sizeUnit: "cm",
+  weight: "", weightUnit: "kg", numberOfPackages: "", length: "", width: "", height: "", sizeUnit: "cm",
   description: "", buyingRate: "", sellingRate: "",
 };
 
 function EmployeeDashboard() {
   const [shipments, setShipments] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [mode, setMode] = useState("Road");
+  const [clientName, setClientName] = useState("");
+  const [consignee, setConsignee] = useState("");
   const [sender, setSender] = useState(emptyParty);
   const [receiver, setReceiver] = useState(emptyParty);
   const [packageDetails, setPackageDetails] = useState(emptyPackage);
@@ -42,9 +46,13 @@ function EmployeeDashboard() {
     const payload = {
       sender,
       receiver,
+      mode,
+      clientName,
+      consignee,
       packageDetails: {
         ...packageDetails,
         weight: packageDetails.weight ? Number(packageDetails.weight) : undefined,
+        numberOfPackages: packageDetails.numberOfPackages ? Number(packageDetails.numberOfPackages) : undefined,
         length: packageDetails.length ? Number(packageDetails.length) : undefined,
         width: packageDetails.width ? Number(packageDetails.width) : undefined,
         height: packageDetails.height ? Number(packageDetails.height) : undefined,
@@ -56,6 +64,9 @@ function EmployeeDashboard() {
     try {
       const res = await api.post("/shipments", payload);
       setMessage(`Shipment created. Tracking number: ${res.data.trackingNumber}`);
+      setMode("Road");
+      setClientName("");
+      setConsignee("");
       setSender(emptyParty);
       setReceiver(emptyParty);
       setPackageDetails(emptyPackage);
@@ -81,11 +92,15 @@ function EmployeeDashboard() {
   const exportShipmentsToExcel = () => {
     const rows = shipments.map((s) => ({
       "Tracking Number": s.trackingNumber,
+      "Mode": s.mode,
+      "Client Name": s.clientName,
+      "Consignee": s.consignee,
       "Sender Name": s.sender.name,
       "Sender City": s.sender.city,
       "Receiver Name": s.receiver.name,
       "Receiver City": s.receiver.city,
       "Weight": s.packageDetails?.weight || "",
+      "Number of Packages": s.packageDetails?.numberOfPackages || "",
       "Buying Rate": s.packageDetails?.buyingRate || "",
       "Selling Rate": s.packageDetails?.sellingRate || "",
       "Current Status": s.currentStatus,
@@ -105,6 +120,29 @@ function EmployeeDashboard() {
       <section className="section">
         <h2>Create New Shipment</h2>
         <form onSubmit={handleCreate} className="form">
+          <fieldset className="fieldset">
+            <legend>Booking Details</legend>
+            <div className="row">
+              <select value={mode} onChange={(e) => setMode(e.target.value)} required>
+                <option value="Road">By Road</option>
+                <option value="Air">By Air</option>
+                <option value="Sea">By Sea</option>
+              </select>
+              <input
+                placeholder="Client Name"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                required
+              />
+            </div>
+            <input
+              placeholder="Consignee"
+              value={consignee}
+              onChange={(e) => setConsignee(e.target.value)}
+              required
+            />
+          </fieldset>
+
           <AddressFields label="Sender" values={sender} onChange={setSender} />
           <AddressFields label="Receiver" values={receiver} onChange={setReceiver} />
 
@@ -117,6 +155,13 @@ function EmployeeDashboard() {
                 <option value="g">g</option>
                 <option value="lb">lb</option>
               </select>
+              <input
+                placeholder="Number of Packages"
+                type="number"
+                value={packageDetails.numberOfPackages}
+                onChange={(e) => setPackageDetails({ ...packageDetails, numberOfPackages: e.target.value })}
+                style={{ flex: 1 }}
+              />
             </div>
             <div className="row">
               <input placeholder="Length" value={packageDetails.length} onChange={(e) => setPackageDetails({ ...packageDetails, length: e.target.value })} />
@@ -155,6 +200,7 @@ function EmployeeDashboard() {
             <thead>
               <tr>
                 <th>Tracking #</th>
+                <th>Mode</th>
                 <th>From</th>
                 <th>To</th>
                 <th>Status</th>
@@ -165,6 +211,7 @@ function EmployeeDashboard() {
               {shipments.map((s) => (
                 <tr key={s._id}>
                   <td>{s.trackingNumber}</td>
+                  <td>{s.mode}</td>
                   <td>{s.sender.city}</td>
                   <td>{s.receiver.city}</td>
                   <td><span className={`status-badge status-${s.currentStatus}`}>{s.currentStatus}</span></td>

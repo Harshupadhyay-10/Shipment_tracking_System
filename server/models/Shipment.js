@@ -44,6 +44,7 @@ const shipmentSchema = new mongoose.Schema(
     packageDetails: {
       weight: { type: Number },
       weightUnit: { type: String, enum: ["kg", "g", "lb"], default: "kg" },
+      numberOfPackages: { type: Number},
       length: { type: Number },
       width: { type: Number },
       height: { type: Number },
