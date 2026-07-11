@@ -1,25 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import api from "../api/axios";
 
 function TrackShipment() {
-  const [trackingNumber, setTrackingNumber] = useState("");
+  const { trackingNumberParam } = useParams();
+  const [trackingNumber, setTrackingNumber] = useState(trackingNumberParam || "");
   const [shipment, setShipment] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleTrack = async (e) => {
-    e.preventDefault();
+  const runTrack = async (number) => {
     setError("");
     setShipment(null);
 
-    if (!trackingNumber.trim()) {
+    if (!number.trim()) {
       setError("Please enter a tracking number");
       return;
     }
 
     setLoading(true);
     try {
-      const res = await api.get(`/track/${trackingNumber.trim()}`);
+      const res = await api.get(`/track/${number.trim()}`);
       setShipment(res.data);
     } catch (err) {
       if (err.response && err.response.status === 404) {
@@ -32,60 +33,71 @@ function TrackShipment() {
     }
   };
 
-return (
-  <div className="page-container-narrow">
-    <h1>Track Your Shipment</h1>
-    <p className="text-muted">Go Between India Logistics</p>
+  useEffect(() => {
+    if (trackingNumberParam) {
+      runTrack(trackingNumberParam);
+    }
+  }, [trackingNumberParam]);
 
-    <form onSubmit={handleTrack} className="row" style={{ marginBottom: "20px" }}>
-      <input
-        type="text"
-        placeholder="Enter tracking number (e.g. GBI7F3K9QXZ)"
-        value={trackingNumber}
-        onChange={(e) => setTrackingNumber(e.target.value)}
-        style={{ flex: 1 }}
-      />
-      <button type="submit" className="btn btn-primary" disabled={loading}>
-        {loading ? "Tracking..." : "Track"}
-      </button>
-    </form>
+  const handleTrack = (e) => {
+    e.preventDefault();
+    runTrack(trackingNumber);
+  };
 
-    {error && <p className="text-error">{error}</p>}
+  return (
+    <div className="page-container-narrow">
+      <h1>Track Your Shipment</h1>
+      <p className="text-muted">Go Between India Logistics</p>
 
-    {shipment && (
-      <div className="card">
-        <h2>Tracking Number: {shipment.trackingNumber}</h2>
-        <p><strong>Mode:</strong> {shipment.mode}</p>
-        <p>
-          <strong>From:</strong> {shipment.sender.city} &nbsp;to&nbsp;
-          <strong>To:</strong> {shipment.receiver.city}
-        </p>
-        <p>
-          <strong>Current Status:</strong>{" "}
-          <span className={`status-badge status-${shipment.currentStatus}`}>
-            {shipment.currentStatus}
-          </span>
-        </p>
+      <form onSubmit={handleTrack} className="row" style={{ marginBottom: "20px" }}>
+        <input
+          type="text"
+          placeholder="Enter tracking number (e.g. GBIR7F3K9QXZ)"
+          value={trackingNumber}
+          onChange={(e) => setTrackingNumber(e.target.value)}
+          style={{ flex: 1 }}
+        />
+        <button type="submit" className="btn btn-primary" disabled={loading}>
+          {loading ? "Tracking..." : "Track"}
+        </button>
+      </form>
 
-        <h3>Status History</h3>
-        <ul className="timeline">
-          {shipment.statusHistory
-            .slice()
-            .reverse()
-            .map((entry, idx) => (
-              <li key={idx} className="timeline-item">
-                <strong>{entry.status}</strong>
-                {entry.location && ` at ${entry.location}`}
-                <br />
-                <small className="text-muted">{new Date(entry.updatedAt).toLocaleString()}</small>
-                {entry.note && <p className="text-muted">{entry.note}</p>}
-              </li>
-            ))}
-        </ul>
-      </div>
-    )}
-  </div>
-);
+      {error && <p className="text-error">{error}</p>}
+
+      {shipment && (
+        <div className="card">
+          <h2>Tracking Number: {shipment.trackingNumber}</h2>
+          <p><strong>Mode:</strong> {shipment.mode}</p>
+          <p>
+            <strong>From:</strong> {shipment.sender.city} &nbsp;to&nbsp;
+            <strong>To:</strong> {shipment.receiver.city}
+          </p>
+          <p>
+            <strong>Current Status:</strong>{" "}
+            <span className={`status-badge status-${shipment.currentStatus}`}>
+              {shipment.currentStatus}
+            </span>
+          </p>
+
+          <h3>Status History</h3>
+          <ul className="timeline">
+            {shipment.statusHistory
+              .slice()
+              .reverse()
+              .map((entry, idx) => (
+                <li key={idx} className="timeline-item">
+                  <strong>{entry.status}</strong>
+                  {entry.location && ` at ${entry.location}`}
+                  <br />
+                  <small className="text-muted">{new Date(entry.updatedAt).toLocaleString()}</small>
+                  {entry.note && <p className="text-muted">{entry.note}</p>}
+                </li>
+              ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default TrackShipment;

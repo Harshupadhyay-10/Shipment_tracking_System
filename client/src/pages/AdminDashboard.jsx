@@ -31,6 +31,7 @@ function AdminDashboard() {
   const [customers, setCustomers] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editingTrackingNumber, setEditingTrackingNumber] = useState(null);
 
   const [mode, setMode] = useState("Road");
   const [clientName, setClientName] = useState("");
@@ -86,40 +87,40 @@ function AdminDashboard() {
     setCreating(true);
     setMessage("");
 
-    const payload = {
-      sender,
-      receiver,
-      mode,
-      clientName,
-      consignee,
-      packageDetails: {
-        ...packageDetails,
-        weight: packageDetails.weight ? Number(packageDetails.weight) : undefined,
-        numberOfPackages: packageDetails.numberOfPackages ? Number(packageDetails.numberOfPackages) : undefined,
-        length: packageDetails.length ? Number(packageDetails.length) : undefined,
-        width: packageDetails.width ? Number(packageDetails.width) : undefined,
-        height: packageDetails.height ? Number(packageDetails.height) : undefined,
-        buyingRate: packageDetails.buyingRate ? Number(packageDetails.buyingRate) : undefined,
-        sellingRate: packageDetails.sellingRate ? Number(packageDetails.sellingRate) : undefined,
-      },
-    };
+  const payload = {
+    sender,
+    receiver,
+    mode,
+    clientName,
+    consignee,
+    packageDetails: {
+      ...packageDetails,
+      weight: packageDetails.weight ? Number(packageDetails.weight) : undefined,
+      numberOfPackages: packageDetails.numberOfPackages ? Number(packageDetails.numberOfPackages) : undefined,
+      length: packageDetails.length ? Number(packageDetails.length) : undefined,
+      width: packageDetails.width ? Number(packageDetails.width) : undefined,
+      height: packageDetails.height ? Number(packageDetails.height) : undefined,
+      buyingRate: packageDetails.buyingRate ? Number(packageDetails.buyingRate) : undefined,
+      sellingRate: packageDetails.sellingRate ? Number(packageDetails.sellingRate) : undefined,
+    },
+  };
 
-    try {
+  try {
+    if (editingTrackingNumber) {
+      await api.patch(`/shipments/${editingTrackingNumber}`, payload);
+      setMessage(`Shipment ${editingTrackingNumber} updated successfully.`);
+    } else {
       const res = await api.post("/shipments", payload);
       setMessage(`Shipment created. Tracking number: ${res.data.trackingNumber}`);
-      setMode("Road");
-      setClientName("");
-      setConsignee("");
-      setSender(emptyParty);
-      setReceiver(emptyParty);
-      setPackageDetails(emptyPackage);
-      fetchShipments();
-    } catch (err) {
-      setMessage("Failed to create shipment. Check all required fields.");
-    } finally {
-      setCreating(false);
     }
-  };
+    handleCancelEdit();
+    fetchShipments();
+  } catch (err) {
+    setMessage(editingTrackingNumber ? "Failed to update shipment." : "Failed to create shipment. Check all required fields.");
+  } finally {
+    setCreating(false);
+  }
+};
 
   const handleStatusUpdate = async (trackingNumber, status) => {
     const location = prompt("Enter current location (optional):") || "";
@@ -155,6 +156,36 @@ function AdminDashboard() {
     } catch (err) {
       alert("Failed to delete employee");
     }
+  };
+
+  const handleEditClick = (shipment) => {
+    setEditingTrackingNumber(shipment.trackingNumber);
+    setMode(shipment.mode);
+    setClientName(shipment.clientName);
+    setConsignee(shipment.consignee);
+    setSender(shipment.sender);
+    setReceiver(shipment.receiver);
+    setPackageDetails({
+      ...shipment.packageDetails,
+      weight: shipment.packageDetails?.weight ?? "",
+      numberOfPackages: shipment.packageDetails?.numberOfPackages ?? "",
+      length: shipment.packageDetails?.length ?? "",
+      width: shipment.packageDetails?.width ?? "",
+      height: shipment.packageDetails?.height ?? "",
+      buyingRate: shipment.packageDetails?.buyingRate ?? "",
+      sellingRate: shipment.packageDetails?.sellingRate ?? "",
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingTrackingNumber(null);
+    setMode("Road");
+    setClientName("");
+    setConsignee("");
+    setSender(emptyParty);
+    setReceiver(emptyParty);
+    setPackageDetails(emptyPackage);
   };
 
   const exportShipmentsToExcel = () => {
@@ -224,7 +255,7 @@ function AdminDashboard() {
       <h1>Admin Dashboard, Go Between India Logistics</h1>
 
       <section className="section">
-        <h2>Create New Shipment</h2>
+        <h2>{editingTrackingNumber ? `Edit Shipment ${editingTrackingNumber}` : "Create New Shipment"}</h2>
         <form onSubmit={handleCreate} className="form">
           <fieldset className="fieldset">
             <legend>Booking Details</legend>
@@ -327,9 +358,16 @@ function AdminDashboard() {
             />
           </fieldset>
 
-          <button type="submit" disabled={creating} className="btn btn-primary">
-            {creating ? "Creating..." : "Create Shipment"}
-          </button>
+          <div className="row">
+            <button type="submit" disabled={creating} className="btn btn-primary">
+              {creating ? "Saving..." : editingTrackingNumber ? "Update Shipment" : "Create Shipment"}
+            </button>
+            {editingTrackingNumber && (
+              <button type="button" onClick={handleCancelEdit} className="btn btn-danger">
+                Cancel Edit
+              </button>
+            )}
+          </div>
         </form>
         {message && <p><strong>{message}</strong></p>}
       </section>
@@ -357,6 +395,7 @@ function AdminDashboard() {
                 <th>Selling Rate</th>
                 <th>Margin</th>
                 <th>Status</th>
+                <th>Edit</th>
                 <th>Update</th>
               </tr>
             </thead>
@@ -388,6 +427,11 @@ function AdminDashboard() {
                       <span className={`status-badge status-${s.currentStatus}`}>
                         {s.currentStatus}
                       </span>
+                    </td>
+                    <td>
+                      <button onClick={() => handleEditClick(s)} className="btn btn-accent">
+                        Edit
+                      </button>
                     </td>
                     <td>
                       <select

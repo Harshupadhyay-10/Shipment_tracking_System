@@ -12,6 +12,7 @@ const statusHistorySchema = new mongoose.Schema(
 
 const partySchema = {
   name: { type: String, required: true },
+  email: { type: String },
   countryCode: { type: String, required: true, default: "+91" },
   phone: { type: String, required: true },
   address: { type: String, required: true },

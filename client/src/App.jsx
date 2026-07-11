@@ -47,6 +47,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/setup" element={<AdminSetup />} />
+          <Route path="/" element={<TrackShipment />} />
+          <Route path="/track/:trackingNumberParam" element={<TrackShipment />} />
           <Route
             path="/admin"
             element={

@@ -59,6 +59,13 @@ function AddressFields({ label, values, onChange }) {
         required
       />
 
+      <input
+        placeholder="Email (optional)"
+        type="email"
+        value={values.email || ""}
+        onChange={(e) => handleFieldChange("email", e.target.value)}
+      />
+
       <div className="phone-row">
         <select
           value={values.countryCode}
