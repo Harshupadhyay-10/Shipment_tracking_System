@@ -1,11 +1,15 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  connectionTimeout: 10000,
+  family: 4, // force IPv4, avoids the IPv6 timeout issue some cloud hosts hit with Gmail
 });
 
 async function sendEmail({ to, subject, html }) {
@@ -16,8 +20,8 @@ async function sendEmail({ to, subject, html }) {
       subject,
       html,
     });
+    console.log("Email sent successfully to:", to);
   } catch (err) {
-    // Log but never throw, a failed email should never block shipment creation
     console.error("Email send failed:", err.message);
   }
 }
