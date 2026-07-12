@@ -14,6 +14,14 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+    failedLoginAttempts: {
+      type: Number,
+      default: 0,
+    },
+    lockUntil: {
+      type: Date,
+      default: null,
+    },
     password: {
       type: String,
       required: true,
