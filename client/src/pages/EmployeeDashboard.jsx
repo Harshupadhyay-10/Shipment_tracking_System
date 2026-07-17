@@ -201,10 +201,10 @@ function EmployeeDashboard() {
               <tr>
                 <th>Tracking #</th>
                 <th>Mode</th>
+                <th>Shipper Name</th>
+                <th>Consignee Name</th>
                 <th>From</th>
                 <th>To</th>
-                <th>Status</th>
-                <th>Update</th>
               </tr>
             </thead>
             <tbody>
@@ -212,6 +212,8 @@ function EmployeeDashboard() {
                 <tr key={s._id}>
                   <td>{s.trackingNumber}</td>
                   <td>{s.mode}</td>
+                  <td>{s.sender.name}</td>
+                  <td>{s.consignee}</td>
                   <td>{s.sender.city}</td>
                   <td>{s.receiver.city}</td>
                   <td><span className={`status-badge status-${s.currentStatus}`}>{s.currentStatus}</span></td>
